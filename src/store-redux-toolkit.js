@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import {composeWithDevTools} from 'redux-devtools-extension';
-import productReducer from './redux-toolkit/reducers/productReducer';
+import {productsListSlice, productDetailSlice } from './redux-toolkit/reducers/productReducer';
 
 export const store = configureStore({
   reducer: {
-    products: productReducer
+    productsList: productsListSlice.reducer,
+    productDetail: productDetailSlice.reducer
   },undefined,
   devTools: true,
 })

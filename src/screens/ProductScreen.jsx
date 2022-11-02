@@ -1,84 +1,95 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from "react-router-dom";
 import Rating from '../components/Rating';
-import products from '../products';
+import { ThreeDots } from 'react-loader-spinner';
 import axios from 'axios';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { getDetail } from '../redux-toolkit/reducers/productReducer'
+import Message from '../components/Message';
 
 const ProductScreen = () => {
     let { id } = useParams();
-    const [product, setProduct] = useState();
     const [loading, setLoading] = useState(true);
-    //const product = products.find((p) => p._id === id)
+    const dispatch = useDispatch();
+    const productDetail = useSelector(state => state.productDetail)
+    const { product } = productDetail;
+    const [error, setError] = useState(null)
 
-    const fetchProduct = async() => {
-        const {data} = await axios.get('http://localhost:3000/api/product/' + id);
-        setProduct(data)
-        console.log(data);
-        setLoading(false)
+    const fetchProduct = async () => {
+        try {
+            const { data } = await axios.get(process.env.REACT_APP_API_URL + 'products/' + id);
+            dispatch(getDetail(data));
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            setError(error.response.data.message)
+        }
     }
 
     useEffect(() => {
         fetchProduct();
-    },[id])  
+    }, [id])
 
     return (
         <>
-            <Link to={"/"} className="btn btn-light my-3">Retour</Link>
-            {loading ? 'loading...' : (
-            <div className="row">
-            <div className="col-md-6">
-                <img src={product.image} alt="image du produit" />
-            </div>
-            <div className="col-md-3">
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <h4>{product.name}</h4>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <Rating value={product.rating} text={`${product.numReviews} reviews`} />
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <h4>Price : {product.price}$</h4>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Description : {product.description}
-                    </li>
+        <Link to={"/"} className="btn btn-light my-3">Retour</Link>
+        {loading
+            ? <ThreeDots wrapperStyle={{ justifyContent: 'center' }} />
+            : error !== null
+                ? <Message variant="danger">{error}</Message>
+                : (
+                <div className="row">
+                    <div className="col-md-6">
+                        <img src={product.image} alt="image du produit" />
+                    </div>
+                    <div className="col-md-3">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <h4>{product.name}</h4>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <Rating value={product.rating} text={`${product.numReviews} reviews`} />
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <h4>Price : {product.price}$</h4>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Description : {product.description}
+                            </li>
 
-                </ul>
-            </div>
-            <div className="col-md-3">
-                <div className="card">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div className="row">
-                                <div className="col">
-                                    Price:
-                                </div>
-                                <div className="col">
-                                    <strong>{product.price}$</strong>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div className="row">
-                                <div className="col">
-                                    Status:
-                                </div>
-                                <div className="col">
-                                    <strong>{product.countInStock > 0 ? 'In stock' : 'Out of stock'}</strong>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-center align-items-center ">
-                            <button disabled={product.countInStock === 0 } className="btn btn-primary">Add to cart</button>
-                        </li>
-                    </ul>
+                        </ul>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="card">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div className="row">
+                                        <div className="col">
+                                            Price:
+                                        </div>
+                                        <div className="col">
+                                            <strong>{product.price}$</strong>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div className="row">
+                                        <div className="col">
+                                            Status:
+                                        </div>
+                                        <div className="col">
+                                            <strong>{product.countInStock > 0 ? 'In stock' : 'Out of stock'}</strong>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-center align-items-center ">
+                                    <button disabled={product.countInStock === 0} className="btn btn-primary">Add to cart</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-            )}
-
+                )}
         </>
     )
 }

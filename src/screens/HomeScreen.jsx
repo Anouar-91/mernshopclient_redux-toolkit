@@ -10,18 +10,17 @@ import { setProductData } from '../redux-toolkit/reducers/productReducer';
 
 const HomeScreen = () => {
     const dispatch = useDispatch();
-    const products = useSelector(state => state.products.products)
+    const products = useSelector(state => state.productsList.products)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     const fetchProducts = async () => {
         try {
-            const { data } = await axios.get('http://localhost:3000/api/products');
+            const { data } = await axios.get(process.env.REACT_APP_API_URL +'products');
             dispatch(setProductData(data));
             setLoading(false);
         } catch (error) {
             setLoading(false);
-            console.log(error)
             setError(error.response.data.message)
         }
 
