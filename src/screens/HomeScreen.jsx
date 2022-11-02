@@ -4,32 +4,21 @@ import Product from '../components/Product';
 import axios from 'axios';
 //redux
 import { useDispatch, useSelector } from 'react-redux';
-import { listProducts } from '../actions/productActions';
+import { setProductData } from '../redux-toolkit/reducers/productReducer';
 
 const HomeScreen = () => {
-    //without redux
-    /*  const [products, setProducts] = useState();
-        const [loading, setLoading] = useState(true)
-    
-        const fetchProducts = async() => {
-            const {data} = await axios.get('http://localhost:3000/api/products');
-            setProducts(data);
-            setLoading(false);
-        }
-        useEffect(() => {
-            fetchProducts()
-        },[]) */
-
-    //with redux
     const dispatch = useDispatch();
-    const productList = useSelector(state => state.productList)
-    const { loading, error, products } = productList
+    const product = useSelector(state => state.products)
+    const [loading, setLoading] = useState(true)
 
+    const fetchProducts = async () => {
+        const { data } = await axios.get('http://localhost:3000/api/products');
+        dispatch(setProductData(data));
+        setLoading(false);
+    }
     useEffect(() => {
-        dispatch(listProducts())
+        fetchProducts()
     }, [dispatch])
-
-
 
     return (
         <>
@@ -42,12 +31,9 @@ const HomeScreen = () => {
                                 <Product product={product} />
                             </div>
                         )
-
                     })}
                 </div>
-
             }
-
         </>
     )
 }
