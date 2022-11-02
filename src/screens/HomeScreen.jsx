@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from 'react'
-import products from '../products';
 import Product from '../components/Product';
 import axios from 'axios';
+import {ThreeDots} from  'react-loader-spinner';
+import Message from '../components/Message';
+
 //redux
 import { useDispatch, useSelector } from 'react-redux';
 import { setProductData } from '../redux-toolkit/reducers/productReducer';
 
 const HomeScreen = () => {
     const dispatch = useDispatch();
-    const product = useSelector(state => state.products)
+    const products = useSelector(state => state.products.products)
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
     const fetchProducts = async () => {
-        const { data } = await axios.get('http://localhost:3000/api/products');
-        dispatch(setProductData(data));
-        setLoading(false);
+        try {
+            const { data } = await axios.get('http://localhost:3000/api/products');
+            dispatch(setProductData(data));
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.log(error)
+            setError(error.response.data.message)
+        }
+
     }
     useEffect(() => {
         fetchProducts()
@@ -23,7 +33,11 @@ const HomeScreen = () => {
     return (
         <>
             <h1>Latest Products</h1>
-            {loading ? 'chargement...' :
+            {loading 
+            ? <ThreeDots wrapperStyle={{justifyContent: 'center'}} />  
+            : error !== null
+            ? <Message variant="danger">{error}</Message>
+            :
                 <div className="row">
                     {products.map(product => {
                         return (
