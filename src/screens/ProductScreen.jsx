@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDetail } from '../redux-toolkit/reducers/productReducer'
 import Message from '../components/Message';
+import { useNavigate } from "react-router-dom";
 
 const ProductScreen = () => {
     let { id } = useParams();
@@ -14,7 +15,12 @@ const ProductScreen = () => {
     const productDetail = useSelector(state => state.productDetail)
     const { product } = productDetail;
     const [error, setError] = useState(null)
+    const [qty, setQty] = useState(0);
+    const navigate = useNavigate();
 
+    const addToCartHandler = () => {
+        navigate(`/cart/${id}?qty=${qty}`)
+    }
     const fetchProduct = async () => {
         try {
             const { data } = await axios.get(process.env.REACT_APP_API_URL + 'products/' + id);
@@ -82,8 +88,25 @@ const ProductScreen = () => {
                                         </div>
                                     </div>
                                 </li>
+                                {product.countInStock > 0 && (
+                                        <li className="list-group-item d-flex justify-content-center align-items-center ">
+                                            <div className="row">
+                                                <div className="col">Qty</div>
+                                                <div className="col">
+                                                    <select className="form-select" value={qty} onChange={(e) => setQty(e.target.value)} >
+                                                        <option selected>Open this select menu</option>
+                                                        {
+                                                            [...Array(product.countInStock).keys()].map((x) => (
+                                                                <option  key={x + 1} value={x + 1}>{x + 1}</option>
+                                                            ))
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    )}
                                 <li class="list-group-item d-flex justify-content-center align-items-center ">
-                                    <button disabled={product.countInStock === 0} className="btn btn-primary">Add to cart</button>
+                                <button onClick={() => addToCartHandler()} disabled={product.countInStock === 0} className="btn btn-primary">Add to cart</button>
                                 </li>
                             </ul>
                         </div>
