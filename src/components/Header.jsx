@@ -16,7 +16,7 @@ const Header = () => {
             </ul>
             <ul className="navbar-nav d-flex">
             <li className="nav-item">
-                <a className="nav-link" href="#">Cart</a>
+                <Link className="nav-link" to="/cart">Cart</Link>
               </li>
             <li className="nav-item">
                 <a className="nav-link" href="#">Sign up</a>
