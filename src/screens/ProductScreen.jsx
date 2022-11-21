@@ -49,17 +49,17 @@ const ProductScreen = () => {
                         <img src={product.image} alt="image du produit" />
                     </div>
                     <div className="col-md-3">
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <ul className="list-group">
+                            <li className="list-group-item d-flex justify-content-between align-items-center">
                                 <h4>{product.name}</h4>
                             </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li className="list-group-item d-flex justify-content-between align-items-center">
                                 <Rating value={product.rating} text={`${product.numReviews} reviews`} />
                             </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li className="list-group-item d-flex justify-content-between align-items-center">
                                 <h4>Price : {product.price}$</h4>
                             </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li className="list-group-item d-flex justify-content-between align-items-center">
                                 Description : {product.description}
                             </li>
 
@@ -67,8 +67,8 @@ const ProductScreen = () => {
                     </div>
                     <div className="col-md-3">
                         <div className="card">
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <ul className="list-group">
+                                <li className="list-group-item d-flex justify-content-between align-items-center">
                                     <div className="row">
                                         <div className="col">
                                             Price:
@@ -78,7 +78,7 @@ const ProductScreen = () => {
                                         </div>
                                     </div>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li className="list-group-item d-flex justify-content-between align-items-center">
                                     <div className="row">
                                         <div className="col">
                                             Status:
@@ -105,7 +105,7 @@ const ProductScreen = () => {
                                             </div>
                                         </li>
                                     )}
-                                <li class="list-group-item d-flex justify-content-center align-items-center ">
+                                <li className="list-group-item d-flex justify-content-center align-items-center ">
                                 <button onClick={() => addToCartHandler()} disabled={product.countInStock === 0} className="btn btn-primary">Add to cart</button>
                                 </li>
                             </ul>

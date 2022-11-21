@@ -23,7 +23,6 @@ const HomeScreen = () => {
             setLoading(false);
             setError(error.response.data.message)
         }
-
     }
     useEffect(() => {
         fetchProducts()
