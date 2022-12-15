@@ -20,13 +20,17 @@ export const login = createAsyncThunk("user/login", async (auth) => {
   }
 });
 
+const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
+
 export const userLoginSlice = createSlice({
   name: "userLogin",
   initialState: {
+    userInfo:userInfoFromStorage
   },
   reducers: {
     logout: (state, { payload }) => {
-      state = {}
+      localStorage.removeItem('userInfo')
+      return {}
     },
   },
   extraReducers: (builder) => {
@@ -37,6 +41,7 @@ export const userLoginSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         const {_id} = action.payload
         if(_id){
+          localStorage.setItem("userInfo", JSON.stringify(action.payload) )
           return  { loading: false, userInfo: action.payload };
         }else{
           return {error:action.payload }
