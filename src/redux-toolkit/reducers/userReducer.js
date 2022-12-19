@@ -59,6 +59,32 @@ export const getUserDetails = createAsyncThunk("user/profile", async (id, {getSt
   }
 })
 
+export const updateUserProfile = createAsyncThunk("user/profile/update", async (user, {getState, dispatch}) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            'Content-Type' : 'application/json',
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+  
+    const {data} = await axios.put(process.env.REACT_APP_API_URL + 'users/profile',  user, config)
+    try {
+      dispatch(userLoginSlice.actions.update(data));
+
+    } catch (error) {
+      console.log(error)
+    }
+    localStorage.setItem('userInfo', JSON.stringify(data))
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
+
 const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
 
 export const userLoginSlice = createSlice({
@@ -70,6 +96,12 @@ export const userLoginSlice = createSlice({
     logout: (state, { payload }) => {
       localStorage.removeItem('userInfo')
       return {}
+    },
+    update: (state, { payload }) => {
+      console.log(payload, "je suis dans update")
+      return {
+       userInfo: {...state.userInfo, ...payload}
+      }
     },
   },
   extraReducers: (builder) => {
@@ -138,4 +170,31 @@ export const userDetailsSlice = createSlice({
   },
 });
 
-export const { logout } = userLoginSlice.actions;
+export const userUpdateProfileSlice = createSlice({
+  name: "userUpdateProfile",
+  initialState: {
+    user:{}
+  },
+  reducers: {
+    reset: (state, { payload }) => {
+      return {}
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(updateUserProfile.pending, (state) => {
+        return  {loading: true};
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        const {_id} = action.payload
+        if(_id){
+          return  {loading: false, user: action.payload, success: true};
+        }else{
+          return {loading: false, error: action.payload}
+        }
+      })
+  },
+});
+
+export const { logout, update } = userLoginSlice.actions;
+export const { reset } = userUpdateProfileSlice.actions;

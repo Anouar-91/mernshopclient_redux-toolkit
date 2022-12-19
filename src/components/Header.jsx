@@ -9,7 +9,7 @@ const Header = () => {
   const { userInfo } = userLogin;
   useEffect(() => {
 
-  }, [])
+  }, [userInfo, dispatch])
   const logoutHandler = () => {
     dispatch(logout())
   }
