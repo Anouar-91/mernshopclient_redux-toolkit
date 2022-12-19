@@ -28,10 +28,29 @@ export const register = createAsyncThunk("user/register", async (auth, thunkAPI)
     }
   }
   try {
-    const { data } = await axios.post(process.env.REACT_APP_API_URL + 'users/register', {
+    const {data} = await axios.post(process.env.REACT_APP_API_URL + 'users/register', {
       name, email, password
-    }, config)
+  }, config)
     thunkAPI.dispatch(login({email,password }))
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
+
+export const getUserDetails = createAsyncThunk("user/profile", async (id, {getState}) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            'Content-Type' : 'application/json',
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'users/' + id, config)
+
     return data;
   } catch (error) {
     return error.response && error.response.data.message
@@ -91,6 +110,29 @@ export const userRegisterSlice = createSlice({
           return  { loading: false, userInfo: action.payload };
         }else{
           return {error:action.payload }
+        }
+      })
+  },
+});
+
+export const userDetailsSlice = createSlice({
+  name: "userDetails",
+  initialState: {
+    user:{}
+  },
+  reducers: {
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getUserDetails.pending, (state) => {
+        return {...state,  loading: true };
+      })
+      .addCase(getUserDetails.fulfilled, (state, action) => {
+        const {_id} = action.payload
+        if(_id){
+          return  {loading: false, user: action.payload};
+        }else{
+          return {loading: false, error: action.payload}
         }
       })
   },
