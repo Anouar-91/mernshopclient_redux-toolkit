@@ -19,7 +19,12 @@ const LoginScreen = ({ }) => {
     const redirect = location.search ? location.search.split('=')[1] : '/'
     const submitHandler = (e) => {
         e.preventDefault();
-        dispatch(login({email, password}))
+        try {
+            dispatch(login({email, password}))
+
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     useEffect(() => {

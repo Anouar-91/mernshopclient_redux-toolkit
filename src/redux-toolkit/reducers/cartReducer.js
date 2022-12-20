@@ -17,11 +17,13 @@ export const fetchProductById = createAsyncThunk(
     }
 )
 const cartItemsFromStorage = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : []
+const shippingAddress = localStorage.getItem('shippingAddress') ? JSON.parse(localStorage.getItem('shippingAddress')) : {}
 
 export const cartSlice = createSlice({
     name: "cart",
     initialState: {
         cartItems: cartItemsFromStorage,
+        shippingAddress:shippingAddress
     },
     reducers: {
         removeFromCartById: (state, { payload }) => {
@@ -30,6 +32,13 @@ export const cartSlice = createSlice({
                 cartItems: state.cartItems.filter(x => x.product !== payload)
             }
         },
+        saveShippingAddress:(state, {payload}) => {
+            localStorage.setItem('shippingAddress', JSON.stringify(payload))
+            return {
+                ...state,
+                shppingAddress:  payload
+            }
+        }
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed
@@ -52,4 +61,4 @@ export const cartSlice = createSlice({
     },
 });
 
-  export const {removeFromCartById}  = cartSlice.actions;
+  export const {removeFromCartById, saveShippingAddress}  = cartSlice.actions;
