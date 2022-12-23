@@ -23,7 +23,7 @@ export const cartSlice = createSlice({
     name: "cart",
     initialState: {
         cartItems: cartItemsFromStorage,
-        shippingAddress:shippingAddress
+        shippingAddress: shippingAddress
     },
     reducers: {
         removeFromCartById: (state, { payload }) => {
@@ -32,33 +32,41 @@ export const cartSlice = createSlice({
                 cartItems: state.cartItems.filter(x => x.product !== payload)
             }
         },
-        saveShippingAddress:(state, {payload}) => {
+        saveShippingAddress: (state, { payload }) => {
             localStorage.setItem('shippingAddress', JSON.stringify(payload))
             return {
                 ...state,
-                shppingAddress:  payload
+                shppingAddress: payload
             }
-        }
-    },
-    extraReducers: (builder) => {
-        // Add reducers for additional action types here, and handle loading state as needed
-        builder.addCase(fetchProductById.fulfilled, (state, action) => {
-            const item = action.payload
-
-            const existItem = state.cartItems.find(x => x.product === item.product)
-            if (existItem) {
-                return  {
-                    ...state,
-                    cartItems: state.cartItems.map(x => x.product === existItem.product ? item : x)
-                }
-            } else {
-                return {
-                    ...state,
-                    cartItems: [...state.cartItems, item]
-                }
+        },
+        savePaymentMethod: (state, { payload }) => {
+            localStorage.setItem('paymentMethod', JSON.stringify(payload))
+            return {
+                ...state,
+                paymentMethod: payload
             }
-        })
-    },
-});
 
-  export const {removeFromCartById, saveShippingAddress}  = cartSlice.actions;
+        },
+    },
+        extraReducers: (builder) => {
+            // Add reducers for additional action types here, and handle loading state as needed
+            builder.addCase(fetchProductById.fulfilled, (state, action) => {
+                const item = action.payload
+
+                const existItem = state.cartItems.find(x => x.product === item.product)
+                if (existItem) {
+                    return {
+                        ...state,
+                        cartItems: state.cartItems.map(x => x.product === existItem.product ? item : x)
+                    }
+                } else {
+                    return {
+                        ...state,
+                        cartItems: [...state.cartItems, item]
+                    }
+                }
+            })
+        },
+    });
+
+export const { removeFromCartById, saveShippingAddress, savePaymentMethod } = cartSlice.actions;
