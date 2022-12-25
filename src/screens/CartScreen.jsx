@@ -16,7 +16,7 @@ const CartScreen = ({ }) => {
 
   const checkoutHandler = () => {
     console.log("checkout")
-    navigate('/login?redirect=shipping')
+    navigate('/shipping')
     
   }
   const removeFromCartHandler = (id) => {

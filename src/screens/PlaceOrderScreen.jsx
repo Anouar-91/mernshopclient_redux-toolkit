@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
+import { createOrder } from '../redux-toolkit/reducers/orderReducer';
 const PlaceOrderScreen = () => {
   const cart = useSelector(state => state.cart)
-  console.log(cart)
+  const orderCreate = useSelector(state => state.orderCreate)
+  const { order, success, error } = orderCreate
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   //calculate prices 
   const addDecimals = (num) => {
     return (Math.round(num * 100) / 100).toFixed(2)
   }
 
-  
+
   let itemsPrice = addDecimals(cart.cartItems.reduce(
     (acc, item) => acc + item.price * item.qty, 0
   ))
@@ -20,8 +24,24 @@ const PlaceOrderScreen = () => {
   let taxPrice = addDecimals(Number((0.15 * itemsPrice).toFixed(2)))
   let totalPrice = (Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice)).toFixed(2)
 
-  const placeOrderHandler = () => {
+  useEffect(() => {
+    console.log(success)
 
+    if (success) {
+      navigate(`/order/${order._id}`)
+    }
+  }, [navigate, success])
+
+  const placeOrderHandler = () => {
+    dispatch(createOrder({
+      orderItems: cart.cartItems,
+      shippingAddress: cart.shippingAddress,
+      paymentMethod: cart.paymentMethod,
+      itemsPrice: itemsPrice,
+      shippingPrice: shippingPrice,
+      taxPrice: taxPrice,
+      totalPrice: totalPrice
+    }))
   }
   return (
     <>
@@ -30,8 +50,8 @@ const PlaceOrderScreen = () => {
         <div className="row mt-5">
 
           <div className="col-md-8">
-            <ul class="list-group">
-              <li class="list-group-item">
+            <ul className="list-group">
+              <li className="list-group-item">
                 <h3>Shipping</h3>
                 <p>
                   <strong>Address: </strong>
@@ -39,7 +59,7 @@ const PlaceOrderScreen = () => {
                 </p>
 
               </li>
-              <li class="list-group-item">
+              <li className="list-group-item">
                 <h3>Payment Method</h3>
                 <p>
                   <strong>Method: </strong>
@@ -47,12 +67,12 @@ const PlaceOrderScreen = () => {
                 </p>
 
               </li>
-              <li class="list-group-item">
+              <li className="list-group-item">
                 <h3>Order items</h3>
                 {cart.cartItems.length === 0 ? <Message>Your cart is empty</Message> : (
-                  <ul class="list-group">
+                  <ul className="list-group">
                     {cart.cartItems.map((item, index) => (
-                      <li key={index} class="list-group-item">
+                      <li key={index} className="list-group-item">
                         <div className="row">
                           <div className="col md-1">
                             <img src={item.image} alt={item.name} className="img-fluid rounded w-50" />
@@ -77,10 +97,10 @@ const PlaceOrderScreen = () => {
           <div className="col-md-4">
             <div className="card">
               <ul className="list-group">
-                <li class="list-group-item">
+                <li className="list-group-item">
                   <h3>Order Summary</h3>
                 </li>
-                <li class="list-group-item">
+                <li className="list-group-item">
                   <div className="row">
                     <div className="col">
                       Items
@@ -88,7 +108,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">${itemsPrice}</div>
                   </div>
                 </li>
-                <li class="list-group-item">
+                <li className="list-group-item">
                   <div className="row">
                     <div className="col">
                       Shipping
@@ -96,7 +116,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">${shippingPrice}</div>
                   </div>
                 </li>
-                <li class="list-group-item">
+                <li className="list-group-item">
                   <div className="row">
                     <div className="col">
                       Tax
@@ -104,7 +124,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">${taxPrice}</div>
                   </div>
                 </li>
-                <li class="list-group-item">
+                <li className="list-group-item">
                   <div className="row">
                     <div className="col">
                       Total
@@ -112,7 +132,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">${totalPrice}</div>
                   </div>
                 </li>
-                <li class="list-group-item text-center">
+                <li className="list-group-item text-center">
                   <button className="btn btn-lg btn-primary" disabled={cart.cartItems === 0} onClick={() => placeOrderHandler()}>Place order</button>
                 </li>
 
