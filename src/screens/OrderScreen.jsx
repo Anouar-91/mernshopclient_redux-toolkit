@@ -1,77 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
-import { createOrder } from '../redux-toolkit/reducers/orderReducer';
-const PlaceOrderScreen = () => {
-  const cart = useSelector(state => state.cart)
-  const orderCreate = useSelector(state => state.orderCreate)
-  const { order, success, error } = orderCreate
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  //calculate prices 
-  const addDecimals = (num) => {
-    return (Math.round(num * 100) / 100).toFixed(2)
-  }
+import Loader from '../components/Loader';
+import { getOrderDetails } from '../redux-toolkit/reducers/orderReducer';
+const OrderScreen = () => {
+  let { id } = useParams();
+  const orderDetails = useSelector(state => state.orderDetails)
+  const { order, loading, error } = orderDetails
+  let itemsPrice;
 
-
-  let itemsPrice = addDecimals(cart.cartItems.reduce(
-    (acc, item) => acc + item.price * item.qty, 0
-  ))
-
-  let shippingPrice = addDecimals(itemsPrice > 100 ? 0 : 100)
-  let taxPrice = addDecimals(Number((0.15 * itemsPrice).toFixed(2)))
-  let totalPrice = (Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice)).toFixed(2)
-
-  useEffect(() => {
-    console.log(success)
-
-    if (success) {
-      navigate(`/order/${order._id}`)
+  if (!loading) {
+    //calculate prices 
+    const addDecimals = (num) => {
+      return (Math.round(num * 100) / 100).toFixed(2)
     }
-  }, [navigate, success, cart])
-
-  const placeOrderHandler = () => {
-    dispatch(createOrder({
-      orderItems: cart.cartItems,
-      shippingAddress: cart.shippingAddress,
-      paymentMethod: cart.paymentMethod,
-      itemsPrice: itemsPrice,
-      shippingPrice: shippingPrice,
-      taxPrice: taxPrice,
-      totalPrice: totalPrice
-    }))
+    itemsPrice = addDecimals(order.orderItems.reduce(
+      (acc, item) => acc + item.price * item.qty, 0
+    ))
   }
-  return (
-    <>
-      <div className="mt-3">
-        <CheckoutSteps step={4} />
-        <div className="row mt-5">
 
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if(!order || order._id !== id) {
+        dispatch(getOrderDetails(id))
+    }
+}, [order, id]) 
+
+  return loading ? <Loader />
+
+    : error ? <Message variant='danger'>{error}</Message>
+      : <>
+        <h1>Order {order._id}</h1>
+        <div className="row mt-5">
           <div className="col-md-8">
             <ul className="list-group">
               <li className="list-group-item">
                 <h3>Shipping</h3>
                 <p>
-                  <strong>Address: </strong>
-                  {cart.shippingAddress.address}, {cart.shippingAddress.city}, {cart.shippingAddress.postalCode}, {cart.shippingAddress.country}
-                </p>
+                <strong>Name: </strong> {order.user.name} 
 
+                </p>
+                <p>
+                <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
+
+                </p>
+                <p>
+                  <strong>Address: </strong>
+                  {order.shippingAddress.address}, {order.shippingAddress.city}, {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+                </p>
+                {order.isDelivered ? (<Message variant="success">Delivered on {order.isDelivered}</Message>) 
+                :(<Message variant="danger">Not delivered</Message>)}
               </li>
               <li className="list-group-item">
                 <h3>Payment Method</h3>
                 <p>
                   <strong>Method: </strong>
-                  {cart.paymentMethod}
+                  {order.paymentMethod}
                 </p>
+                {order.isPaid ? (<Message variant="success">Paid on {order.paidAt}</Message>) 
+                :(<Message variant="danger">Not paid</Message>)}
 
               </li>
               <li className="list-group-item">
                 <h3>Order items</h3>
-                {cart.cartItems.length === 0 ? <Message>Your cart is empty</Message> : (
+                {order.orderItems.length === 0 ? <Message>Order is empty</Message> : (
                   <ul className="list-group">
-                    {cart.cartItems.map((item, index) => (
+                    {order.orderItems.map((item, index) => (
                       <li key={index} className="list-group-item">
                         <div className="row">
                           <div className="col md-1">
@@ -113,7 +109,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">
                       Shipping
                     </div>
-                    <div className="col">${shippingPrice}</div>
+                    <div className="col">${order.shippingPrice}</div>
                   </div>
                 </li>
                 <li className="list-group-item">
@@ -121,7 +117,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">
                       Tax
                     </div>
-                    <div className="col">${taxPrice}</div>
+                    <div className="col">${order.taxPrice}</div>
                   </div>
                 </li>
                 <li className="list-group-item">
@@ -129,23 +125,14 @@ const PlaceOrderScreen = () => {
                     <div className="col">
                       Total
                     </div>
-                    <div className="col">${totalPrice}</div>
+                    <div className="col">${order.totalPrice}</div>
                   </div>
                 </li>
-                <li class="list-group-item text-center">
-                  {error && <Message variant="danger">{error}</Message>}
-                </li>
-                <li className="list-group-item text-center">
-                  <button className="btn btn-lg btn-primary" disabled={cart.cartItems === 0} onClick={() => placeOrderHandler()}>Place order</button>
-                </li>
-
               </ul>
             </div>
           </div>
         </div>
-      </div>
-    </>
-  )
+      </>
 }
 
-export default PlaceOrderScreen
+export default OrderScreen
