@@ -41,6 +41,28 @@ export const getOrderDetails = createAsyncThunk(
             console.log(error)
         }
     })
+
+export const payOrder = createAsyncThunk(
+    'order/pay',
+    async (order, { getState }) => {
+        const { userLogin: { userInfo } } = getState()
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + userInfo.token
+            }
+        }
+        try {
+            const { data } = await axios.put(process.env.REACT_APP_API_URL + 'orders/' + order.id + "/pay", order.paymentResult, config)
+            const payload = {
+                data
+            }
+            return payload
+        } catch (error) {
+            console.log(error)
+        }
+    })
+
 export const orderCreateSlice = createSlice({
     name: "orderCreate",
     initialState: {
@@ -76,6 +98,8 @@ export const orderCreateSlice = createSlice({
             })
     },
 });
+
+
 export const orderDetailsSlice = createSlice({
     name: "orderDetails",
     initialState: { loading: true, orderItems: [], shippingAddress: {} },
@@ -96,6 +120,40 @@ export const orderDetailsSlice = createSlice({
                     return {
                         loading: false,
                         order: action.payload.data
+                    };
+                } else {
+                    return {
+                        loading: false,
+                        error: action.payload
+                    }
+                }
+            })
+    },
+});
+
+export const orderPaySlice = createSlice({
+    name: "orderPay",
+    initialState: {},
+    reducers: {
+        reset: (state, { payload }) => {
+            return {
+            }
+        },
+    },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder
+            .addCase(payOrder.pending, (state) => {
+                return {
+                    loading: true,
+                };
+            })
+            .addCase(getOrderDetails.fulfilled, (state, action) => {
+                const { _id } = action.payload.data
+                if (_id) {
+                    return {
+                        loading: false,
+                        success:true 
                     };
                 } else {
                     return {
