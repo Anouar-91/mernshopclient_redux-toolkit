@@ -1,4 +1,4 @@
-import { $CombinedState, configureStore } from '@reduxjs/toolkit';
+import { CombinedState, configureStore } from '@reduxjs/toolkit';
 import {productsListSlice, productDetailSlice } from './redux-toolkit/reducers/productReducer';
 import {cartSlice } from './redux-toolkit/reducers/cartReducer';
 import {userRegisterSlice, userDetailsSlice, userLoginSlice, userUpdateProfileSlice, } from './redux-toolkit/reducers/userReducer';

@@ -52,11 +52,13 @@ export const payOrder = createAsyncThunk(
                 Authorization: 'Bearer ' + userInfo.token
             }
         }
+        console.log(order)
         try {
-            const { data } = await axios.put(process.env.REACT_APP_API_URL + 'orders/' + order.id + "/pay", order.paymentResult, config)
+            const { data } = await axios.put(process.env.REACT_APP_API_URL + 'orders/' + order.orderId + "/pay", order.paymentResult, config)
             const payload = {
                 data
             }
+            console.log(payload, "payload payOrder")
             return payload
         } catch (error) {
             console.log(error)
@@ -148,7 +150,7 @@ export const orderPaySlice = createSlice({
                     loading: true,
                 };
             })
-            .addCase(getOrderDetails.fulfilled, (state, action) => {
+            .addCase(payOrder.fulfilled, (state, action) => {
                 const { _id } = action.payload.data
                 if (_id) {
                     return {
@@ -165,3 +167,4 @@ export const orderPaySlice = createSlice({
     },
 });
 
+export const { reset } = orderPaySlice.actions;
