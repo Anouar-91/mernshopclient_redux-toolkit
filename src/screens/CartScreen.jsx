@@ -27,6 +27,7 @@ const CartScreen = ({ }) => {
     }
   }, [dispatch, id, qty])
   return (
+    <div className="container">
     <div className="row mt-3">
       <div className="col-md-8">
         <h1>Shopping Cart</h1>
@@ -82,6 +83,8 @@ const CartScreen = ({ }) => {
       </div>
     
     </div>
+    </div>
+
   )
 }
 

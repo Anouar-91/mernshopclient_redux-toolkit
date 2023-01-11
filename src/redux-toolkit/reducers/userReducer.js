@@ -99,6 +99,24 @@ export const updateUserProfile = createAsyncThunk("user/profile/update", async (
   }
 })
 
+export const listUsers = createAsyncThunk("user/list", async (test, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'users', config)
+
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
+
 const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null
 
 export const userLoginSlice = createSlice({
@@ -213,6 +231,27 @@ export const userUpdateProfileSlice = createSlice({
       })
   },
 });
+export const userListSlice = createSlice({
+  name: "userList",
+  initialState: {loading:true},
+  reducers: {
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(listUsers.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(listUsers.fulfilled, (state, action) => {
+        if (action.payload.length >= 0) {
+          return { loading: false, users:action.payload};
+        } else {
+          return { loading: false, error: action.payload }
+        }
+      })
+  },
+});
+
+
 
 export const { update } = userLoginSlice.actions;
 export const { reset } = userUpdateProfileSlice.actions;

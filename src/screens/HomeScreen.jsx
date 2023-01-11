@@ -29,7 +29,7 @@ const HomeScreen = () => {
     }, [dispatch])
 
     return (
-        <>
+        <div className="container">
             <h1>Latest Products</h1>
             {loading 
             ? <ThreeDots wrapperStyle={{justifyContent: 'center'}} />  
@@ -46,7 +46,7 @@ const HomeScreen = () => {
                     })}
                 </div>
             }
-        </>
+        </div>
     )
 }
 
