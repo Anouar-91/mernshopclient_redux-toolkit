@@ -58,8 +58,23 @@ export const payOrder = createAsyncThunk(
             const payload = {
                 data
             }
-            console.log(payload, "payload payOrder")
             return payload
+        } catch (error) {
+            console.log(error)
+        }
+    })
+
+export const listMyOrders = createAsyncThunk('order/listMy',async (test, { getState }) => {
+        const { userLogin: { userInfo } } = getState()
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + userInfo.token
+            }
+        }
+        try {
+            const {data} = await axios.get(process.env.REACT_APP_API_URL + 'orders/myorders', config)
+            return data
         } catch (error) {
             console.log(error)
         }
@@ -167,4 +182,37 @@ export const orderPaySlice = createSlice({
     },
 });
 
+export const orderListMySlice = createSlice({
+    name: "orderListMy",
+    initialState: {orders:[]},
+    reducers: {
+        resetListOrder: (state, { payload }) => {
+            return {orders:[]}
+        },
+    },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder
+            .addCase(listMyOrders.pending, (state) => {
+                return {
+                    loading: true,
+                };
+            })
+            .addCase(listMyOrders.fulfilled, (state, action) => {
+                if (action.payload.length >= 0) {
+                    return {
+                        loading: false,
+                        orders:action.payload 
+                    };
+                } else {
+                    return {
+                        loading: false,
+                        error: action.payload
+                    }
+                }
+            })
+    },
+});
+
 export const { reset } = orderPaySlice.actions;
+export const { resetListOrder } = orderListMySlice.actions;

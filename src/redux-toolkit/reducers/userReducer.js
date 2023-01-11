@@ -1,8 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { resetListOrder } from "./orderReducer";
+
+export const logout = createAsyncThunk("user/logout", async (auth, { getState, dispatch }) => {
+
+  try {
+    localStorage.removeItem('userInfo');
+    dispatch(resetUserDetail())
+    dispatch(resetListOrder())
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+});
 
 export const login = createAsyncThunk("user/login", async (auth) => {
-  const {email, password} = auth;
+  const { email, password } = auth;
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -21,17 +35,17 @@ export const login = createAsyncThunk("user/login", async (auth) => {
 });
 
 export const register = createAsyncThunk("user/register", async (auth, thunkAPI) => {
-  const {name, email, password} = auth;
+  const { name, email, password } = auth;
   const config = {
     headers: {
       'Content-Type': 'application/json',
     }
   }
   try {
-    const {data} = await axios.post(process.env.REACT_APP_API_URL + 'users/register', {
+    const { data } = await axios.post(process.env.REACT_APP_API_URL + 'users/register', {
       name, email, password
-  }, config)
-    thunkAPI.dispatch(login({email,password }))
+    }, config)
+    thunkAPI.dispatch(login({ email, password }))
     return data;
   } catch (error) {
     return error.response && error.response.data.message
@@ -40,16 +54,16 @@ export const register = createAsyncThunk("user/register", async (auth, thunkAPI)
   }
 })
 
-export const getUserDetails = createAsyncThunk("user/profile", async (id, {getState}) => {
+export const getUserDetails = createAsyncThunk("user/profile", async (id, { getState }) => {
   try {
-    const {userLogin: {userInfo}} = getState()
+    const { userLogin: { userInfo } } = getState()
     const config = {
-        headers:{
-            'Content-Type' : 'application/json',
-            Authorization: 'Bearer ' +userInfo.token
-        }
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + userInfo.token
+      }
     }
-    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'users/' + id, config)
+    const { data } = await axios.get(process.env.REACT_APP_API_URL + 'users/' + id, config)
 
     return data;
   } catch (error) {
@@ -59,17 +73,17 @@ export const getUserDetails = createAsyncThunk("user/profile", async (id, {getSt
   }
 })
 
-export const updateUserProfile = createAsyncThunk("user/profile/update", async (user, {getState, dispatch}) => {
+export const updateUserProfile = createAsyncThunk("user/profile/update", async (user, { getState, dispatch }) => {
   try {
-    const {userLogin: {userInfo}} = getState()
+    const { userLogin: { userInfo } } = getState()
     const config = {
-        headers:{
-            'Content-Type' : 'application/json',
-            Authorization: 'Bearer ' +userInfo.token
-        }
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + userInfo.token
+      }
     }
-  
-    const {data} = await axios.put(process.env.REACT_APP_API_URL + 'users/profile',  user, config)
+
+    const { data } = await axios.put(process.env.REACT_APP_API_URL + 'users/profile', user, config)
     try {
       dispatch(userLoginSlice.actions.update(data));
 
@@ -90,17 +104,12 @@ const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localS
 export const userLoginSlice = createSlice({
   name: "userLogin",
   initialState: {
-    userInfo:userInfoFromStorage
+    userInfo: userInfoFromStorage
   },
   reducers: {
-    logout: (state, { payload }) => {
-      localStorage.removeItem('userInfo')
-      return {}
-    },
     update: (state, { payload }) => {
-      console.log(payload, "je suis dans update")
       return {
-       userInfo: {...state.userInfo, ...payload}
+        userInfo: { ...state.userInfo, ...payload }
       }
     },
   },
@@ -110,13 +119,19 @@ export const userLoginSlice = createSlice({
         return { loading: true };
       })
       .addCase(login.fulfilled, (state, action) => {
-        const {_id} = action.payload
-        if(_id){
-          localStorage.setItem("userInfo", JSON.stringify(action.payload) )
-          return  { loading: false, userInfo: action.payload };
-        }else{
-          return {error:action.payload }
+        const { _id } = action.payload
+        if (_id) {
+          localStorage.setItem("userInfo", JSON.stringify(action.payload))
+          return { loading: false, userInfo: action.payload };
+        } else {
+          return { error: action.payload }
         }
+      })
+      .addCase(logout.pending, (state, action) => {
+        return {}
+      })
+      .addCase(logout.fulfilled, (state, action) => {
+        return {}
       })
 
   },
@@ -126,7 +141,7 @@ export const userLoginSlice = createSlice({
 export const userRegisterSlice = createSlice({
   name: "userRegister",
   initialState: {
-    userInfo:null
+    userInfo: null
   },
   reducers: {
   },
@@ -136,12 +151,12 @@ export const userRegisterSlice = createSlice({
         return { loading: true };
       })
       .addCase(register.fulfilled, (state, action) => {
-        const {_id} = action.payload
-        if(_id){
-          localStorage.setItem("userInfo", JSON.stringify(action.payload) )
-          return  { loading: false, userInfo: action.payload };
-        }else{
-          return {error:action.payload }
+        const { _id } = action.payload
+        if (_id) {
+          localStorage.setItem("userInfo", JSON.stringify(action.payload))
+          return { loading: false, userInfo: action.payload };
+        } else {
+          return { error: action.payload }
         }
       })
   },
@@ -150,21 +165,24 @@ export const userRegisterSlice = createSlice({
 export const userDetailsSlice = createSlice({
   name: "userDetails",
   initialState: {
-    user:{}
+    user: {}
   },
   reducers: {
+    resetUserDetail: (state, { payload }) => {
+      return {}
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getUserDetails.pending, (state) => {
-        return {...state,  loading: true };
+        return { ...state, loading: true };
       })
       .addCase(getUserDetails.fulfilled, (state, action) => {
-        const {_id} = action.payload
-        if(_id){
-          return  {loading: false, user: action.payload};
-        }else{
-          return {loading: false, error: action.payload}
+        const { _id } = action.payload
+        if (_id) {
+          return { loading: false, user: action.payload };
+        } else {
+          return { loading: false, error: action.payload }
         }
       })
   },
@@ -173,7 +191,7 @@ export const userDetailsSlice = createSlice({
 export const userUpdateProfileSlice = createSlice({
   name: "userUpdateProfile",
   initialState: {
-    user:{}
+    user: {}
   },
   reducers: {
     reset: (state, { payload }) => {
@@ -183,18 +201,19 @@ export const userUpdateProfileSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(updateUserProfile.pending, (state) => {
-        return  {loading: true};
+        return { loading: true };
       })
       .addCase(updateUserProfile.fulfilled, (state, action) => {
-        const {_id} = action.payload
-        if(_id){
-          return  {loading: false, user: action.payload, success: true};
-        }else{
-          return {loading: false, error: action.payload}
+        const { _id } = action.payload
+        if (_id) {
+          return { loading: false, user: action.payload, success: true };
+        } else {
+          return { loading: false, error: action.payload }
         }
       })
   },
 });
 
-export const { logout, update } = userLoginSlice.actions;
+export const { update } = userLoginSlice.actions;
 export const { reset } = userUpdateProfileSlice.actions;
+export const { resetUserDetail } = userDetailsSlice.actions;

@@ -15,7 +15,6 @@ const CartScreen = ({ }) => {
   const navigate = useNavigate();
 
   const checkoutHandler = () => {
-    console.log("checkout")
     navigate('/shipping')
     
   }
@@ -23,7 +22,6 @@ const CartScreen = ({ }) => {
     dispatch(removeFromCart(id))
   }
   useEffect(() => {
-    console.log(localStorage.getItem("cartItems"))
     if (id) {
       dispatch(addCart(id, qty))
     }

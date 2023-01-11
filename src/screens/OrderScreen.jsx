@@ -13,7 +13,6 @@ const OrderScreen = () => {
   const { order, loading, error } = orderDetails
   const orderPay = useSelector(state => state.orderPay)
   const { loading: loadingPay, success: successPay } = orderPay
-  console.log(orderPay)
   const [sdkReady, setSdkReady] = useState(false);
 
   const addPaypalScript = async () => {
@@ -54,7 +53,6 @@ const OrderScreen = () => {
   }, [order, id, successPay])
 
   const successPaymentHandler = (paymentResult) => {
-    console.log(paymentResult)
     const orderId = order._id;
     dispatch(payOrder({orderId, paymentResult}))
   }

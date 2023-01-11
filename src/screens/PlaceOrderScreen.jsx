@@ -25,8 +25,6 @@ const PlaceOrderScreen = () => {
   let totalPrice = (Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice)).toFixed(2)
 
   useEffect(() => {
-    console.log(success)
-
     if (success) {
       navigate(`/order/${order._id}`)
     }
