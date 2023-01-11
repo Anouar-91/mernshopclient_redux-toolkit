@@ -242,9 +242,10 @@ export const userListSlice = createSlice({
         return { loading: true };
       })
       .addCase(listUsers.fulfilled, (state, action) => {
-        if (action.payload.length >= 0) {
+        if (typeof action.payload != "string") {
           return { loading: false, users:action.payload};
         } else {
+          console.log("je suis dans error")
           return { loading: false, error: action.payload }
         }
       })
