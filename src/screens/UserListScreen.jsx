@@ -1,21 +1,38 @@
 import React from 'react'
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { listUsers } from '../redux-toolkit/reducers/userReducer';
+import { deleteUser, listUsers } from '../redux-toolkit/reducers/userReducer';
 
 const UserListScreen = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const userList = useSelector(state => state.userList)
     const { loading, error, users } = userList
-    useEffect(() => {
-        dispatch(listUsers())
-    }, [dispatch ])
 
-    const deleteHandler = () => {
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+    const userDelete = useSelector(state => state.userDelete)
+    const {success: successDelete} = userDelete
+    useEffect(() => {
+        if (userInfo && userInfo.isAdmin) {
+            dispatch(listUsers())
+        } else {
+            navigate('/login')
+        }
+    }, [dispatch, successDelete])
+
+
+    const deleteHandler = (id) => {
+        if (window.confirm('Are you sure ?')) {
+            dispatch(deleteUser(id))
+        }
     }
+
 
     return (
         <>
@@ -40,7 +57,7 @@ const UserListScreen = () => {
                                 <td> <a href={`mailot:${user.email}`}>{user.email}</a></td>
                                 <td>{user.isAdmin ? <i class="fa-solid fa-check text-success"></i> : <i class="fa-solid fa-xmark text-danger"></i>}</td>
                                 <td>
-                                    <Link  className="btn btn-sm btn-warning" to={`/user/${user._id}/edit`}><i class="fa-regular fa-pen-to-square"></i></Link> 
+                                    <Link className="btn btn-sm btn-warning" to={`/user/${user._id}/edit`}><i class="fa-regular fa-pen-to-square"></i></Link>
                                     <button className="btn btn-sm btn-danger" onClick={() => deleteHandler(user._id)}><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>

@@ -8,6 +8,7 @@ export const logout = createAsyncThunk("user/logout", async (auth, { getState, d
     localStorage.removeItem('userInfo');
     dispatch(resetUserDetail())
     dispatch(resetListOrder())
+    dispatch(resetUserList())
   } catch (error) {
     return error.response && error.response.data.message
       ? error.response.data.message
@@ -108,6 +109,23 @@ export const listUsers = createAsyncThunk("user/list", async (test, { getState }
         }
     }
     const {data} = await axios.get(process.env.REACT_APP_API_URL + 'users', config)
+
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
+export const deleteUser = createAsyncThunk("user/delete", async (id, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.delete(process.env.REACT_APP_API_URL + 'users/'+id, config)
 
     return data;
   } catch (error) {
@@ -233,8 +251,11 @@ export const userUpdateProfileSlice = createSlice({
 });
 export const userListSlice = createSlice({
   name: "userList",
-  initialState: {loading:true},
+  initialState: {users: [],loading:true},
   reducers: {
+    resetUserList: (state, { payload }) => {
+      return {users: [],loading:true}
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -252,8 +273,24 @@ export const userListSlice = createSlice({
   },
 });
 
+export const userDeleteSlice = createSlice({
+  name: "userDelete",
+  initialState: {},
+  reducers: {
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(deleteUser.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+          return{loading: false, success:true}
+      })
+  },
+});
 
 
 export const { update } = userLoginSlice.actions;
 export const { reset } = userUpdateProfileSlice.actions;
 export const { resetUserDetail } = userDetailsSlice.actions;
+export const { resetUserList } = userListSlice.actions;
