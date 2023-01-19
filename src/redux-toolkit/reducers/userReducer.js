@@ -99,6 +99,24 @@ export const updateUserProfile = createAsyncThunk("user/profile/update", async (
       : error.message
   }
 })
+export const updateUser = createAsyncThunk("user/update", async (user, { getState, dispatch }) => {
+  try {
+    const { userLogin: { userInfo } } = getState()
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + userInfo.token
+      }
+    }
+    const {data} = await axios.put(process.env.REACT_APP_API_URL + 'users/'+user._id,user, config)
+
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
 
 export const listUsers = createAsyncThunk("user/list", async (test, { getState }) => {
   try {
@@ -289,8 +307,34 @@ export const userDeleteSlice = createSlice({
   },
 });
 
+export const userUpdateSlice = createSlice({
+  name: "userUpdate",
+  initialState: {user:{}},
+  reducers: {
+    resetUpdateUser: (state, { payload }) => {
+      return {user:{}}
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(updateUser.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        const { _id } = action.payload
+        
+        if(_id){
+          return {loading: false, success:true}
+        }else{
+          return {loading: false, error: action.payload}
+        }
+      })
+  },
+});
+
 
 export const { update } = userLoginSlice.actions;
 export const { reset } = userUpdateProfileSlice.actions;
 export const { resetUserDetail } = userDetailsSlice.actions;
 export const { resetUserList } = userListSlice.actions;
+export const { resetUpdateUser } = userUpdateSlice.actions;

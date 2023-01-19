@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
-import { getUserDetails } from '../redux-toolkit/reducers/userReducer';
+import { getUserDetails, resetUpdateUser, resetUserDetail, updateUser } from '../redux-toolkit/reducers/userReducer';
 
 
 const UserEditScreen = ({ }) => {
@@ -16,21 +16,32 @@ const UserEditScreen = ({ }) => {
     const dispatch = useDispatch();
     const userDetails = useSelector(state => state.userDetails);
     const { loading, error, user } = userDetails;
+
+    const userUpdate = useSelector(state => state.userUpdate);
+    const { loading: loadingUpdate, errorUpdate, success: successUpdate } = userUpdate;
     const navigate = useNavigate();
 
     const submitHandler = (e) => {
         e.preventDefault();
+        dispatch(updateUser({ _id: user._id, name, email, isAdmin }))
+
     }
 
     useEffect(() => {
-        if(!user.name || user._id !== id){
-            dispatch(getUserDetails(id))
-        }else{
-            setName(user.name)
-            setEmail(user.email)
-            setIsAdmin(user.isAdmin)
+        if (successUpdate) {
+            dispatch(resetUpdateUser())
+            dispatch(resetUserDetail())
+            navigate('/admin/userlist')
+        } else {
+            if (!user || !user.name || user._id !== id) {
+                dispatch(getUserDetails(id))
+            } else {
+                setName(user.name)
+                setEmail(user.email)
+                setIsAdmin(user.isAdmin)
+            }
         }
-    }, [user])
+    }, [user, successUpdate, id])
 
     return (
         <>
@@ -52,7 +63,7 @@ const UserEditScreen = ({ }) => {
                             </div>
                             <div className="form-group">
                                 <label htmlFor="isAdmin">Is Admin</label>
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)}/>
+                                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)} />
                             </div>
                             <button className="btn btn-primary mt-3">Update</button>
                         </form>

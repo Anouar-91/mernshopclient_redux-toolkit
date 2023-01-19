@@ -130,7 +130,7 @@ const PlaceOrderScreen = () => {
                     <div className="col">${totalPrice}</div>
                   </div>
                 </li>
-                <li class="list-group-item text-center">
+                <li className="list-group-item text-center">
                   {error && <Message variant="danger">{error}</Message>}
                 </li>
                 <li className="list-group-item text-center">
