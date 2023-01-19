@@ -11,6 +11,23 @@ export const listProducts = createAsyncThunk("product/list", async (test, { getS
       : error.message
   }
 })
+export const deleteProduct = createAsyncThunk("product/delete", async (id, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.delete(process.env.REACT_APP_API_URL + 'products/' + id, config)
+    
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
 
 
 export const productsListSlice = createSlice({
@@ -58,6 +75,35 @@ export const productDetailSlice = createSlice({
     getDetail: (state, { payload }) => {
       state.product = payload;
     },
+  },
+});
+
+
+
+export const productDeleteSlice = createSlice({
+  name: "productDelete",
+  initialState: {loading:true},
+  reducers: {
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(deleteProduct.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+
+        if (action.payload.message == "product removed") {
+          return {
+            loading:false, 
+            success: true
+        }
+        } else {
+          return {
+            loading:false, 
+            error: action.payload
+        }
+        }
+      })
   },
 });
 

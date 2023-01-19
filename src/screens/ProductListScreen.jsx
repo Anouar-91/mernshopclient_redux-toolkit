@@ -4,13 +4,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { listProducts } from '../redux-toolkit/reducers/productReducer';
+import { deleteProduct, listProducts } from '../redux-toolkit/reducers/productReducer';
 
 const ProductListScreen = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const productsList = useSelector(state => state.productsList)
     const { loading, error, products } = productsList
+
+    const productDelete = useSelector(state => state.productDelete)
+    const { loading:loadingDelete, error:errorDelete, success:successDelete } = productDelete
 
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
@@ -21,11 +24,11 @@ const ProductListScreen = () => {
         } else {
             navigate('/login')
         }
-    }, [dispatch, userInfo])
+    }, [dispatch, userInfo, successDelete])
 
     const deleteHandler = (id) => {
         if (window.confirm('Are you sure ?')) {
-            //
+            dispatch(deleteProduct(id))
         }
     }
     const createProductHandler = (product) => {
