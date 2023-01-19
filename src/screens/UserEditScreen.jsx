@@ -51,6 +51,8 @@ const UserEditScreen = ({ }) => {
             <div>
                 <FormContainer>
                     <h1>Edit user</h1>
+                    {loadingUpdate && <Loader/>}
+                    {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
                     {loading ? <Loader /> : error ? <Message variant="danger">{error}</Message> : (
                         <form onSubmit={submitHandler} action="" className="mt-4">
                             <div className="form-group">

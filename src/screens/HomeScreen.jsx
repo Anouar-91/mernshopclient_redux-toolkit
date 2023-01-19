@@ -1,41 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import Product from '../components/Product';
-import axios from 'axios';
-import {ThreeDots} from  'react-loader-spinner';
-import Message from '../components/Message';
-
+import {ThreeDots} from  'react-loader-spinner'
 //redux
 import { useDispatch, useSelector } from 'react-redux';
-import { setProductData } from '../redux-toolkit/reducers/productReducer';
+import Message from '../components/Message';
+import { listProducts } from '../redux-toolkit/reducers/productReducer';
+
 
 const HomeScreen = () => {
     const dispatch = useDispatch();
-    const products = useSelector(state => state.productsList.products)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const productsList = useSelector(state => state.productsList)
+    const { loading, error, products} = productsList
 
-    const fetchProducts = async () => {
-        try {
-            const { data } = await axios.get(process.env.REACT_APP_API_URL +'products');
-            dispatch(setProductData(data));
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            setError(error.response.data.message)
-        }
-    }
     useEffect(() => {
-        fetchProducts()
+        dispatch(listProducts())
     }, [dispatch])
+
+
 
     return (
         <div className="container">
             <h1>Latest Products</h1>
             {loading 
-            ? <ThreeDots wrapperStyle={{justifyContent: 'center'}} />  
-            : error !== null
-            ? <Message variant="danger">{error}</Message>
-            :
+            ? <ThreeDots wrapperStyle={{justifyContent: 'center'}} /> 
+            : error 
+            ? (<Message variant="danger">{error}</Message>) :
                 <div className="row">
                     {products.map(product => {
                         return (
@@ -43,9 +32,12 @@ const HomeScreen = () => {
                                 <Product product={product} />
                             </div>
                         )
+
                     })}
                 </div>
+
             }
+
         </div>
     )
 }
