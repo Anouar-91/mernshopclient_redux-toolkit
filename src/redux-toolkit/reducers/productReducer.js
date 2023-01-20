@@ -28,6 +28,24 @@ export const deleteProduct = createAsyncThunk("product/delete", async (id, { get
       : error.message
   }
 })
+export const createProduct = createAsyncThunk("product/create", async (test, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+          'Content-Type': 'application/json',
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.post(process.env.REACT_APP_API_URL + 'products/',{} ,config)
+    
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
 
 
 export const productsListSlice = createSlice({
@@ -107,8 +125,39 @@ export const productDeleteSlice = createSlice({
   },
 });
 
-export const { getDetail } = productDetailSlice.actions;
+export const productCreateSlice = createSlice({
+  name: "productCreate",
+  initialState: {loading:true},
+  reducers: {
+    resetProductCreate: (state, { payload }) => {
+      return {}
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createProduct.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(createProduct.fulfilled, (state, action) => {
 
+        if (action.payload._id) {
+          return {
+            loading:false, 
+            success: true,
+            product: action.payload
+        }
+        } else {
+          return {
+            loading:false, 
+            error: action.payload
+        }
+        }
+      })
+  },
+});
+
+export const { getDetail } = productDetailSlice.actions;
+export const {resetProductCreate} = productCreateSlice.actions
 /* import { createAction, createReducer } from '@reduxjs/toolkit'
 
 export const setProductData = createAction('product/setProductData')

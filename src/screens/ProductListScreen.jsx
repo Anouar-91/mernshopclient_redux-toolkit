@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { deleteProduct, listProducts } from '../redux-toolkit/reducers/productReducer';
+import { createProduct, deleteProduct, listProducts, resetProductCreate } from '../redux-toolkit/reducers/productReducer';
 
 const ProductListScreen = () => {
     const dispatch = useDispatch();
@@ -15,24 +15,32 @@ const ProductListScreen = () => {
     const productDelete = useSelector(state => state.productDelete)
     const { loading:loadingDelete, error:errorDelete, success:successDelete } = productDelete
 
+    const productCreate = useSelector(state => state.productCreate)
+    const { loading:loadingCreate, error:errorCreate, success:successCreate, product:createdProduct } = productCreate
+
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
 
     useEffect(() => {
-        if (userInfo && userInfo.isAdmin) {
-            dispatch(listProducts())
-        } else {
+        dispatch(resetProductCreate())
+        if (userInfo && !userInfo.isAdmin) {
             navigate('/login')
+        } 
+        if(successCreate) {
+            navigate(`/admin/product/${createdProduct._id}/edit`)
+        }else{
+            dispatch(listProducts())
         }
-    }, [dispatch, userInfo, successDelete])
+    }, [dispatch, userInfo, successDelete, successCreate, createdProduct])
+
 
     const deleteHandler = (id) => {
         if (window.confirm('Are you sure ?')) {
             dispatch(deleteProduct(id))
         }
     }
-    const createProductHandler = (product) => {
-
+    const createProductHandler = () => {
+        dispatch(createProduct())
     }
 
     return (
@@ -45,6 +53,10 @@ const ProductListScreen = () => {
                     <button className="my-3 btn btn-primary" onClick={createProductHandler}>Create product</button>
                 </div>
             </div>
+            {loadingCreate && <Loader/>}
+            {errorCreate && <Message variant="danger">{errorCreate}</Message>}
+            {loadingDelete && <Loader/>}
+            {errorDelete && <Message variant="danger">{errorDelete}</Message>}
             {loading ? <Loader /> : error ? <Message variant="danger">{error}</Message> : (
                 <table className="table table-hover">
                     <thead>
