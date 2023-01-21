@@ -134,7 +134,7 @@ const PlaceOrderScreen = () => {
                   {error && <Message variant="danger">{error}</Message>}
                 </li>
                 <li className="list-group-item text-center">
-                  <button className="btn btn-lg btn-primary" disabled={cart.cartItems === 0} onClick={() => placeOrderHandler()}>Place order</button>
+                  <button className="btn btn-primary" disabled={cart.cartItems === 0} onClick={() => placeOrderHandler()}>Place order</button>
                 </li>
 
               </ul>

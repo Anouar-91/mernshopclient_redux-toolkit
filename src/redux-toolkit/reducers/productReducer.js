@@ -28,6 +28,23 @@ export const deleteProduct = createAsyncThunk("product/delete", async (id, { get
       : error.message
   }
 })
+export const detailProduct = createAsyncThunk("product/detail", async (id, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'products/' + id)
+    
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
 export const createProduct = createAsyncThunk("product/create", async (test, { getState }) => {
   try {
     const {userLogin: {userInfo}} = getState()
@@ -87,12 +104,32 @@ export const { setProductData } = productsListSlice.actions;
 export const productDetailSlice = createSlice({
   name: "productDetail",
   initialState: {
-    product: {},
+    product: {reviews : []}, loading:true
   },
   reducers: {
     getDetail: (state, { payload }) => {
       state.product = payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(detailProduct.pending, (state) => {
+        return {                 loading:true, ...state };
+      })
+      .addCase(detailProduct.fulfilled, (state, action) => {
+
+        if (action.payload._id) {
+          return {
+            loading:false, 
+            product: action.payload
+        }
+        } else {
+          return {
+            loading:false, 
+            error: action.payload
+        }
+        }
+      })
   },
 });
 

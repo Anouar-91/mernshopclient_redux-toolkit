@@ -4,44 +4,36 @@ import Rating from '../components/Rating';
 import { ThreeDots } from 'react-loader-spinner';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDetail } from '../redux-toolkit/reducers/productReducer'
+import { detailProduct, getDetail } from '../redux-toolkit/reducers/productReducer'
 import Message from '../components/Message';
 import { useNavigate } from "react-router-dom";
+import Loader from '../components/Loader';
 
 const ProductScreen = () => {
     let { id } = useParams();
-    const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
     const productDetail = useSelector(state => state.productDetail)
-    const { product } = productDetail;
-    const [error, setError] = useState(null)
+    const {loading, error, product} = productDetail
     const [qty, setQty] = useState(0);
     const navigate = useNavigate();
+
+
 
     const addToCartHandler = () => {
         navigate(`/cart/${id}?qty=${qty}`)
     }
-    const fetchProduct = async () => {
-        try {
-            const { data } = await axios.get(process.env.REACT_APP_API_URL + 'products/' + id);
-            dispatch(getDetail(data));
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            setError(error.response.data.message)
-        }
-    }
+
 
     useEffect(() => {
-        fetchProduct();
+        dispatch(detailProduct(id))
     }, [id])
 
     return (
         <>
         <Link to={"/"} className="btn btn-light my-3">Retour</Link>
         {loading
-            ? <ThreeDots wrapperStyle={{ justifyContent: 'center' }} />
-            : error !== null
+            ? <Loader />
+            : error 
                 ? <Message variant="danger">{error}</Message>
                 : (
                 <div className="row">
