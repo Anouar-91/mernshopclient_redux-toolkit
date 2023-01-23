@@ -5,6 +5,8 @@ import Message from '../components/Message';
 import Loader from '../components/Loader';
 import FormContainer from '../components/FormContainer';
 import { detailProduct, resetProductDetail, resetProductUpdate, updateProduct } from '../redux-toolkit/reducers/productReducer';
+import axios from 'axios';
+
 const ProductEditScreen = ({ }) => {
     let { id } = useParams();
 
@@ -15,6 +17,8 @@ const ProductEditScreen = ({ }) => {
     const [category, setCategory] = useState("")
     const [countInStock, setCountInStock] = useState(0)
     const [description, setDescription] = useState("")
+    const [uploading, setUploading] = useState(false)
+
 
 
     const dispatch = useDispatch();
@@ -26,6 +30,27 @@ const ProductEditScreen = ({ }) => {
     const { loading:loadingUpdate, error:errorUpdate, success:successUpdate } = productUpdate;
 
     const navigate = useNavigate();
+
+    const uploadFileHandler = async (e) => {
+        const file = e.target.files[0];
+        const formData = new FormData()
+        formData.append('image', file)
+        setUploading(true);
+        try {
+            const config = {
+                headers: {
+                    'Content-Type' : 'multipart/form-data'
+                }
+            }
+            const {data} = await axios.post(process.env.REACT_APP_API_URL + 'upload', formData, config)
+            console.log(data)
+            setImage(process.env.REACT_APP_API_URL_IMAGE+data)
+            setUploading(false)
+        } catch (error) {
+            console.error(error)
+            setUploading(false)
+        }
+    }
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -84,6 +109,9 @@ const ProductEditScreen = ({ }) => {
                             <div className="form-group">
                                 <label htmlFor="image">Image</label>
                                 <input id='image' name="image" type="text" value={image} onChange={(e) => setImage(e.target.value)} placeholder="Enter image" className="form-control" />
+                                <label htmlFor="image-file" className="form-label">Choose file</label>
+                                <input className="form-control" type="file" id="image-file" onChange={uploadFileHandler} />
+                                {uploading && <Loader />}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="brand">brand</label>
