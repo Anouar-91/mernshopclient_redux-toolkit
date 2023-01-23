@@ -63,6 +63,24 @@ export const createProduct = createAsyncThunk("product/create", async (test, { g
       : error.message
   }
 })
+export const updateProduct = createAsyncThunk("product/update", async (product, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+          'Content-Type': 'application/json',
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    const {data} = await axios.put(process.env.REACT_APP_API_URL + 'products/'+product._id,{product}, config)
+    
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
 
 
 export const productsListSlice = createSlice({
@@ -109,6 +127,11 @@ export const productDetailSlice = createSlice({
     getDetail: (state, { payload }) => {
       state.product = payload;
     },
+    resetProductDetail: (state, {payload}) => {
+      return {
+        product: {reviews : []}, loading:true
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -191,9 +214,41 @@ export const productCreateSlice = createSlice({
       })
   },
 });
+export const productUpdateSlice = createSlice({
+  name: "productUpdate",
+  initialState: {product:{}},
+  reducers: {
+    resetProductUpdate: (state, { payload }) => {
+      return {product:{}}
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(updateProduct.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+
+        if (action.payload._id) {
+          return {
+            loading:false, 
+            success: true,
+            product: action.payload
+        }
+        } else {
+          return {
+            loading:false, 
+            error: action.payload
+        }
+        }
+      })
+  },
+});
 
 export const { getDetail } = productDetailSlice.actions;
 export const {resetProductCreate} = productCreateSlice.actions
+export const {resetProductUpdate} = productUpdateSlice.actions
+export const {resetProductDetail} = productDetailSlice.actions
 /* import { createAction, createReducer } from '@reduxjs/toolkit'
 
 export const setProductData = createAction('product/setProductData')
