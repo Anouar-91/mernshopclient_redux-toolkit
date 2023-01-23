@@ -82,8 +82,7 @@ export const productsListSlice = createSlice({
         return { loading: true };
       })
       .addCase(listProducts.fulfilled, (state, action) => {
-
-        if (action.payload.length) {
+        if (action.payload.isArray) {
           return {
             loading: false,
             products: action.payload
