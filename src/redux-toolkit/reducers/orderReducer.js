@@ -79,6 +79,21 @@ export const listMyOrders = createAsyncThunk('order/listMy',async (test, { getSt
             console.log(error)
         }
     })
+export const listOrders = createAsyncThunk('order/list',async (test, { getState }) => {
+        const { userLogin: { userInfo } } = getState()
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + userInfo.token
+            }
+        }
+        try {
+            const {data} = await axios.get(process.env.REACT_APP_API_URL + 'orders/', config)
+            return data
+        } catch (error) {
+            console.log(error)
+        }
+    })
 
 export const orderCreateSlice = createSlice({
     name: "orderCreate",
@@ -199,6 +214,37 @@ export const orderListMySlice = createSlice({
                 };
             })
             .addCase(listMyOrders.fulfilled, (state, action) => {
+                if (action.payload.length >= 0) {
+                    return {
+                        loading: false,
+                        orders:action.payload 
+                    };
+                } else {
+                    return {
+                        loading: false,
+                        error: action.payload
+                    }
+                }
+            })
+    },
+});
+export const orderListSlice = createSlice({
+    name: "orderList",
+    initialState: {orders:[]},
+    reducers: {
+        resetListOrder: (state, { payload }) => {
+            return {orders:[]}
+        },
+    },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder
+            .addCase(listOrders.pending, (state) => {
+                return {
+                    loading: true,
+                };
+            })
+            .addCase(listOrders.fulfilled, (state, action) => {
                 if (action.payload.length >= 0) {
                     return {
                         loading: false,
