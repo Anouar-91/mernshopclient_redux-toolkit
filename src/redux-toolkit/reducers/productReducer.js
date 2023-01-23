@@ -82,7 +82,7 @@ export const productsListSlice = createSlice({
         return { loading: true };
       })
       .addCase(listProducts.fulfilled, (state, action) => {
-        if (action.payload.isArray) {
+        if (action.payload instanceof Array) {
           return {
             loading: false,
             products: action.payload
