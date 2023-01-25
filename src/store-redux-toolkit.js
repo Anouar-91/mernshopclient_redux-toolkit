@@ -2,7 +2,7 @@ import { CombinedState, configureStore } from '@reduxjs/toolkit';
 import {productsListSlice, productDetailSlice, productDeleteSlice, productCreateSlice, productUpdateSlice } from './redux-toolkit/reducers/productReducer';
 import {cartSlice } from './redux-toolkit/reducers/cartReducer';
 import {userRegisterSlice, userDetailsSlice, userLoginSlice, userUpdateProfileSlice, userListSlice, userDeleteSlice, userUpdateSlice, } from './redux-toolkit/reducers/userReducer';
-import {orderCreateSlice, orderDetailsSlice, orderListMySlice, orderListSlice, orderPaySlice } from './redux-toolkit/reducers/orderReducer'
+import {orderCreateSlice, orderDeliverSlice, orderDetailsSlice, orderListMySlice, orderListSlice, orderPaySlice } from './redux-toolkit/reducers/orderReducer'
 
 export const store = configureStore({
   reducer: {
@@ -23,7 +23,8 @@ export const store = configureStore({
     productDelete: productDeleteSlice.reducer,
     productCreate: productCreateSlice.reducer,
     productUpdate: productUpdateSlice.reducer,
-    orderList: orderListSlice.reducer
+    orderList: orderListSlice.reducer,
+    orderDeliver: orderDeliverSlice.reducer
   },undefined,
   devTools: true,
 })

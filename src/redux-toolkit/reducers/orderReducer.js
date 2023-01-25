@@ -52,7 +52,6 @@ export const payOrder = createAsyncThunk(
                 Authorization: 'Bearer ' + userInfo.token
             }
         }
-        console.log(order)
         try {
             const { data } = await axios.put(process.env.REACT_APP_API_URL + 'orders/' + order.orderId + "/pay", order.paymentResult, config)
             const payload = {
@@ -94,6 +93,25 @@ export const listOrders = createAsyncThunk('order/list',async (test, { getState 
             console.log(error)
         }
     })
+
+    export const deliverOrder = createAsyncThunk(
+        'order/deliver',
+        async (order, { getState }) => {
+            const { userLogin: { userInfo } } = getState()
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + userInfo.token
+                }
+            }
+            try {
+                const {data} = await axios.put(process.env.REACT_APP_API_URL + 'orders/' + order._id+ "/deliver",{}, config) 
+                console.log(data)        
+                return data;
+            } catch (error) {
+                console.log(error)
+            }
+        })
 
 export const orderCreateSlice = createSlice({
     name: "orderCreate",
@@ -167,7 +185,7 @@ export const orderPaySlice = createSlice({
     name: "orderPay",
     initialState: {},
     reducers: {
-        reset: (state, { payload }) => {
+        resetOrderPay: (state, { payload }) => {
             return {
             }
         },
@@ -259,6 +277,41 @@ export const orderListSlice = createSlice({
             })
     },
 });
+export const orderDeliverSlice = createSlice({
+    name: "orderDeliver",
+    initialState: {},
+    reducers: {
+        resetOrderDeliver: (state, { payload }) => {
+            return {
+            }
+        },
+    },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder
+            .addCase(deliverOrder.pending, (state) => {
+                return {
+                    loading: true,
+                };
+            })
+            .addCase(deliverOrder.fulfilled, (state, action) => {
+                console.log(action.payload)
+                const { _id } = action.payload
+                if (_id) {
+                    return {
+                        loading: false,
+                        success:true 
+                    };
+                } else {
+                    return {
+                        loading: false,
+                        error: action.payload
+                    }
+                }
+            })
+    },
+});
 
-export const { reset } = orderPaySlice.actions;
+export const { resetOrderPay } = orderPaySlice.actions;
+export const { resetOrderDeliver } = orderDeliverSlice.actions;
 export const { resetListOrder } = orderListMySlice.actions;
