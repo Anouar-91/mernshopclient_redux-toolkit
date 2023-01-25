@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const listProducts = createAsyncThunk("product/list", async (test, { getState }) => {
+export const listProducts = createAsyncThunk("product/list", async (keyword = "", { getState }) => {
   try {
-    const { data } = await axios.get(process.env.REACT_APP_API_URL + 'products')
+    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'products?keyword='+keyword)
     return data;
   } catch (error) {
     return error.response && error.response.data.message

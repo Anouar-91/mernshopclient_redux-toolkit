@@ -5,16 +5,18 @@ import {ThreeDots} from  'react-loader-spinner'
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import { listProducts } from '../redux-toolkit/reducers/productReducer';
+import { useParams } from 'react-router-dom';
 
 
 const HomeScreen = () => {
+    let {keyword} = useParams();
     const dispatch = useDispatch();
     const productsList = useSelector(state => state.productsList)
     const { loading, error, products} = productsList
 
     useEffect(() => {
-        dispatch(listProducts())
-    }, [dispatch])
+        dispatch(listProducts(keyword))
+    }, [dispatch, keyword])
 
 
 
