@@ -106,7 +106,6 @@ export const listOrders = createAsyncThunk('order/list',async (test, { getState 
             }
             try {
                 const {data} = await axios.put(process.env.REACT_APP_API_URL + 'orders/' + order._id+ "/deliver",{}, config) 
-                console.log(data)        
                 return data;
             } catch (error) {
                 console.log(error)
@@ -295,7 +294,6 @@ export const orderDeliverSlice = createSlice({
                 };
             })
             .addCase(deliverOrder.fulfilled, (state, action) => {
-                console.log(action.payload)
                 const { _id } = action.payload
                 if (_id) {
                     return {

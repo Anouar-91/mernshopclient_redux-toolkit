@@ -284,7 +284,6 @@ export const userListSlice = createSlice({
         if (typeof action.payload != "string") {
           return { loading: false, users:action.payload};
         } else {
-          console.log("je suis dans error")
           return { loading: false, error: action.payload }
         }
       })

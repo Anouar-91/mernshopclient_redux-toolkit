@@ -1,5 +1,5 @@
 import { CombinedState, configureStore } from '@reduxjs/toolkit';
-import {productsListSlice, productDetailSlice, productDeleteSlice, productCreateSlice, productUpdateSlice } from './redux-toolkit/reducers/productReducer';
+import {productsListSlice, productDetailSlice, productDeleteSlice, productCreateSlice, productUpdateSlice, productCreateReviewSlice } from './redux-toolkit/reducers/productReducer';
 import {cartSlice } from './redux-toolkit/reducers/cartReducer';
 import {userRegisterSlice, userDetailsSlice, userLoginSlice, userUpdateProfileSlice, userListSlice, userDeleteSlice, userUpdateSlice, } from './redux-toolkit/reducers/userReducer';
 import {orderCreateSlice, orderDeliverSlice, orderDetailsSlice, orderListMySlice, orderListSlice, orderPaySlice } from './redux-toolkit/reducers/orderReducer'
@@ -24,7 +24,9 @@ export const store = configureStore({
     productCreate: productCreateSlice.reducer,
     productUpdate: productUpdateSlice.reducer,
     orderList: orderListSlice.reducer,
-    orderDeliver: orderDeliverSlice.reducer
+    orderDeliver: orderDeliverSlice.reducer,
+    productCreateReview: productCreateReviewSlice.reducer
+
   },undefined,
   devTools: true,
 })

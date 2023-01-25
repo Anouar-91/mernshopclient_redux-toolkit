@@ -82,6 +82,27 @@ export const updateProduct = createAsyncThunk("product/update", async (product, 
   }
 })
 
+export const createProductReview = createAsyncThunk("product/createReview", async (product, { getState }) => {
+  try {
+    const {userLogin: {userInfo}} = getState()
+    const config = {
+        headers:{
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' +userInfo.token
+        }
+    }
+    console.log(product.review)
+
+    const {data} = await axios.post(process.env.REACT_APP_API_URL + 'products/'+product.id+"/reviews",product.review, config)
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
+
+
 
 export const productsListSlice = createSlice({
   name: "productsList",
@@ -244,11 +265,40 @@ export const productUpdateSlice = createSlice({
       })
   },
 });
+export const productCreateReviewSlice = createSlice({
+  name: "productCreateReview",
+  initialState: {},
+  reducers: {
+    resetProductCreateReview: (state, { payload }) => {
+      return {}
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createProductReview.pending, (state) => {
+        return { loading: true };
+      })
+      .addCase(createProductReview.fulfilled, (state, action) => {
+        if (action.payload.message === "Review added") {
+          return {
+            loading:false, 
+            success: true,
+        }
+        } else {
+          return {
+            loading:false, 
+            error: action.payload
+        }
+        }
+      })
+  },
+});
 
 export const { getDetail } = productDetailSlice.actions;
 export const {resetProductCreate} = productCreateSlice.actions
 export const {resetProductUpdate} = productUpdateSlice.actions
 export const {resetProductDetail} = productDetailSlice.actions
+export const {resetProductCreateReview} = productCreateReviewSlice.actions
 /* import { createAction, createReducer } from '@reduxjs/toolkit'
 
 export const setProductData = createAction('product/setProductData')
