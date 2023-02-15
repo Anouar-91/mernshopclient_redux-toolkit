@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const listProducts = createAsyncThunk("product/list", async (keyword = "", { getState }) => {
+export const listProducts = createAsyncThunk("product/list", async (params, { getState }) => {
   try {
-    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'products?keyword='+keyword)
+    const keyword = params.keyword ? params.keyword : '';
+    const pageNumber = params.pageNumber ? params.pageNumber : ""
+    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'products?keyword='+keyword+"&pageNumber="+params.pageNumber)
     return data;
   } catch (error) {
     return error.response && error.response.data.message
@@ -121,10 +123,12 @@ export const productsListSlice = createSlice({
         return { loading: true };
       })
       .addCase(listProducts.fulfilled, (state, action) => {
-        if (action.payload instanceof Array) {
+        if (action.payload.products instanceof Array) {
           return {
             loading: false,
-            products: action.payload
+            products: action.payload.products,
+            pages: action.payload.pages,
+            page:action.payload.page
           }
         } else {
           return {
