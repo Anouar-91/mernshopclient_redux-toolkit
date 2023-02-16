@@ -8,6 +8,7 @@ import { listProducts } from '../redux-toolkit/reducers/productReducer';
 import { useParams } from 'react-router-dom';
 import Paginate from '../components/Paginate';
 import ProductCarousel from '../components/ProductCarousel';
+import Meta from '../components/Meta';
 
 
 const HomeScreen = () => {
@@ -25,6 +26,8 @@ const HomeScreen = () => {
 
     return (
         <div className="container">
+                        <Meta />
+
                         {!keyword && <><div className="mt-3"><ProductCarousel /></div></>}
 
             <h1>Latest Products</h1>

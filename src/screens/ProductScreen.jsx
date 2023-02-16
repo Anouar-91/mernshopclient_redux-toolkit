@@ -6,6 +6,7 @@ import { ThreeDots } from 'react-loader-spinner';
 import Message from '../components/Message';
 import { useNavigate } from "react-router-dom";
 import { createProductReview, detailProduct, resetProductCreate, resetProductCreateReview } from '../redux-toolkit/reducers/productReducer';
+import Meta from '../components/Meta';
 
 const ProductScreen = () => {
     let { id } = useParams();
@@ -59,6 +60,8 @@ const ProductScreen = () => {
                 ? <ThreeDots wrapperStyle={{ justifyContent: 'center' }} />
                 : error ? <Message variant='danger'>{error}</Message> : (
                     <>
+                     <Meta title={product.name} />
+
                         <div className="row ">
                             <div className="col-md-6 mt-3">
                                 <img  className='img-fluid' src={product.image} alt="produit" />
