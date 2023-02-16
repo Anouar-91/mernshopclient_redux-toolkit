@@ -61,7 +61,7 @@ const ProductScreen = () => {
                     <>
                         <div className="row ">
                             <div className="col-md-6 mt-3">
-                                <img src={product.image} alt="produit" />
+                                <img  className='img-fluid' src={product.image} alt="produit" />
                             </div>
                             <div className="col-md-3 mt-3">
                                 <ul className="list-group">
@@ -151,7 +151,7 @@ const ProductScreen = () => {
                                                     <option value="2">2 - Fair</option>
                                                     <option value="3">3 - Good</option>
                                                     <option value="4">4 - Very good</option>
-                                                    <option value="5">2 - Excellent</option>
+                                                    <option value="5">5 - Excellent</option>
                                                 </select>
                                                 <div className="form-floating mb-2">
                                                     <textarea required className="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style={{"height": 100}} value={comment} onChange={(e) => setComment(e.target.value)}></textarea>
