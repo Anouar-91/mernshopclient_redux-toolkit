@@ -7,6 +7,7 @@ import Message from '../components/Message';
 import { listProducts } from '../redux-toolkit/reducers/productReducer';
 import { useParams } from 'react-router-dom';
 import Paginate from '../components/Paginate';
+import ProductCarousel from '../components/ProductCarousel';
 
 
 const HomeScreen = () => {
@@ -24,6 +25,8 @@ const HomeScreen = () => {
 
     return (
         <div className="container">
+                        {!keyword && <><div className="mt-3"><ProductCarousel /></div></>}
+
             <h1>Latest Products</h1>
             {loading 
             ? <ThreeDots wrapperStyle={{justifyContent: 'center'}} /> 

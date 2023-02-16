@@ -104,6 +104,16 @@ export const createProductReview = createAsyncThunk("product/createReview", asyn
   }
 })
 
+export const listTopProducts = createAsyncThunk("product/top", async (params, { getState }) => {
+  try {
+    const {data} = await axios.get(process.env.REACT_APP_API_URL + 'products/top')
+    return data;
+  } catch (error) {
+    return error.response && error.response.data.message
+      ? error.response.data.message
+      : error.message
+  }
+})
 
 
 export const productsListSlice = createSlice({
@@ -287,6 +297,38 @@ export const productCreateReviewSlice = createSlice({
           return {
             loading:false, 
             success: true,
+        }
+        } else {
+          return {
+            loading:false, 
+            error: action.payload
+        }
+        }
+      })
+  },
+});
+
+
+export const productTopRateSlice = createSlice({
+  name: "productTop",
+  initialState: {
+    products:[]
+  },
+  reducers: {
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(listTopProducts.pending, (state) => {
+        return {
+          loading:true,
+          products:[]
+      };
+      })
+      .addCase(listTopProducts.fulfilled, (state, action) => {
+        if (action.payload instanceof Array) {
+          return {
+            loading:false, 
+            products: action.payload,
         }
         } else {
           return {
