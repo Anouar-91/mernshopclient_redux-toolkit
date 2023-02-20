@@ -45,7 +45,6 @@ const CartScreen = ({ }) => {
                       <div className="col-md-2">{item.price}$</div>
                       <div className="col-md-2">
                         <select className="form-select" value={item.qty} onChange={(e) => dispatch(addCart(item.product, Number(e.target.value)))} >
-                          <option selected>Open this select menu</option>
                           {
                             [...Array(item.countInStock).keys()].map((x) => (
                               <option key={x + 1} value={x + 1}>{x + 1}</option>
