@@ -40,11 +40,10 @@ const ProfileScreen = ({ }) => {
         if(!userInfo){
             navigate("/login")
         }else{
+            dispatch(listMyOrders())
             if(!user || !user.name || success || userInfo._id != user._id  ){
                 dispatch(reset())
                 dispatch(getUserDetails('profile'))
-                dispatch(listMyOrders())
-
             }else{
                 setName(user.name)
                 setEmail(user.email)
