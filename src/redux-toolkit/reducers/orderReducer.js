@@ -117,6 +117,10 @@ export const orderCreateSlice = createSlice({
     initialState: {
     },
     reducers: {
+        resetOrderCreate: (state, { payload }) => {
+            return {
+            }
+        },
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed
@@ -313,3 +317,4 @@ export const orderDeliverSlice = createSlice({
 export const { resetOrderPay } = orderPaySlice.actions;
 export const { resetOrderDeliver } = orderDeliverSlice.actions;
 export const { resetListOrder } = orderListMySlice.actions;
+export const { resetOrderCreate } = orderCreateSlice.actions;

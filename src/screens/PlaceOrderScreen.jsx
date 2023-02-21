@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
-import { createOrder } from '../redux-toolkit/reducers/orderReducer';
+import { createOrder, resetOrderCreate } from '../redux-toolkit/reducers/orderReducer';
 const PlaceOrderScreen = () => {
   const cart = useSelector(state => state.cart)
   const orderCreate = useSelector(state => state.orderCreate)
@@ -26,6 +26,7 @@ const PlaceOrderScreen = () => {
 
   useEffect(() => {
     if (success) {
+      dispatch(resetOrderCreate());
       navigate(`/order/${order._id}`)
     }
   }, [navigate, success, cart])
